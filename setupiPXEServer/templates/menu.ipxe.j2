@@ -1,0 +1,23 @@
+#!ipxe
+
+#Set Variables
+set boot-url http://{{ SERVER_IP }}/
+
+#Main Menu
+menu iPXE Boot Menu
+#OPTIONSSTART
+#OPTIONSEND
+item shell	iPXE shell
+item exit	Exit
+choose target && goto ${target}
+
+#GOTOSTART
+#GOTOEND
+
+:shell
+shell
+boot
+
+:exit
+exit
+

@@ -1,0 +1,54 @@
+---
+# tasks file for http
+- name: Install HTTPD Package
+  yum:
+    name: httpd
+    state: present
+  register: httpdinstalled
+  
+- name: Open HTTP Port on the Firewall
+  firewalld:
+    service: http
+    permanent: yes
+    state: enabled
+    immediate: yes
+  when: httpdinstalled.changed
+
+- name: Open HTTPS Port on the Firewall
+  firewalld:
+    service: https
+    permanent: yes
+    state: enabled
+    immediate: yes
+  when: httpdinstalled.changed
+  
+- name: Start and Enable HTTPD Service
+  service:
+    name: httpd
+    state: started
+    enabled: yes
+  when: httpdinstalled.changed
+
+- name: Copy Kickstart Files
+  copy:
+    src: ks
+    dest: /var/www/html/
+
+- name: Create Kickstart HTTP Directory
+  file:
+    path: /var/www/html/ks
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Copy iPXE Boot Menu Template
+  template:
+    src: "menu.ipxe.j2"
+    dest: /var/www/html/menu.ipxe
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Apply New SELinux File Context to /var/www/html
+  command: restorecon -FvvR /var/www/html

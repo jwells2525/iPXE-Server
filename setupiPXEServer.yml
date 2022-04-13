@@ -1,0 +1,6 @@
+---
+- hosts: mainGuy
+  become: True
+
+  roles:
+    - { role: setupiPXEServer }

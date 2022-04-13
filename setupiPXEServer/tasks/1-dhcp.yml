@@ -1,0 +1,30 @@
+---
+# tasks file for dhcp
+- name: Install DHCP Package
+  yum:
+    name: dhcp-server
+    state: present
+  register: dhcpinstalled
+  
+- name: Remove Default DHCP File
+  file:
+    path: /etc/dhcp/dhcpd.conf
+    state: absent
+  when: dhcpinstalled.changed
+  
+- name: Copy DHCP Configuration Template
+  template:
+    src: "dhcpd.conf.j2"
+    dest: /etc/dhcp/dhcpd.conf
+    owner: root
+    group: root
+    mode: 0644
+  when: dhcpinstalled.changed
+  
+- name: Restart and Enable DHCP
+  service:
+    name: dhcpd
+    state: restarted
+    enabled: yes
+  when: dhcpinstalled.changed
+  

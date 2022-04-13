@@ -1,0 +1,56 @@
+---
+# tasks file for tftp
+- name: Install TFTP Package
+  yum:
+    name: tftp-server
+    state: present
+  register: tftpinstalled
+  
+- name: Open TFTP on the Firewall
+  firewalld:
+    service: tftp
+    permanent: yes
+    state: enabled
+    immediate: yes
+  when: tftpinstalled.changed
+  
+- name: Restart and Enable TFTP
+  service:
+    name: tftp
+    state: restarted
+    enabled: yes
+  when: tftpinstalled.changed
+  
+- name: Restart and Enable TFTP Socket
+  service:
+    name: tftp.socket
+    state: restarted
+    enabled: yes
+  when: tftpinstalled.changed
+
+- name: Install iPXE Package
+  yum:
+    name: ipxe-bootimgs
+    state: present
+  register: ipxeinstalled
+
+- name: Copy TFTP UEFI PXEBoot Files
+  copy:
+    src: '{{ item }}'
+    dest: /var/lib/tftpboot/
+    remote_src: yes
+  loop:
+    - /usr/share/ipxe/undionly.kpxe
+    - /usr/share/ipxe/ipxe-x86_64.efi
+  when: ipxeinstalled.changed
+
+- name: Change Permissions on tftpboot and SubDirectories
+  file:
+    path: /var/lib/tftpboot
+    mode: '0755'
+    recurse: yes
+  when: ipxeinstalled.changed
+
+- name: Apply New SELinux File Context to /var/lib/tftpboot
+  command: restorecon -FvvR /var/lib/tftpboot
+  when: ipxeinstalled.changed

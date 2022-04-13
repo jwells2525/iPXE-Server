@@ -1,0 +1,17 @@
+---
+# List of Linux Systems to Setup
+- name: Place Red Hat Enterprise Linux onto PXE Server
+  vars:
+#    - MENU_LABEL: 'rhelmanual'
+    - MENU_DISTRO: 'RHEL8'
+    - ISO_NAME: 'rhel-8.5-x86_64-dvd.iso'
+    - KICKSTART: ""
+  include_tasks: 4-linuxiso.yml
+
+- name: Place KVM Red Hat Enterprise Linux onto PXE Server
+  vars:
+#    - MENU_LABEL: 'rhelmanual'
+    - MENU_DISTRO: 'RHEL8'
+    - ISO_NAME: 'rhel-8.5-x86_64-dvd.iso'
+    - KICKSTART: 'kvm-ks.cfg'
+  include_tasks: 4-linuxiso.yml

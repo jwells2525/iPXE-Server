@@ -1,0 +1,13 @@
+---
+# tasks file for setupPXEServer
+- name: Setup DHCP on System
+  include_tasks: 1-dhcp.yml
+
+- name: Setup TFTP on System
+  include_tasks: 2-tftp.yml
+
+- name: Setup HTTP on System
+  include_tasks: 3-http.yml
+
+- name: Setup the Linux Systems
+  include_tasks: linuxSystems.yml
