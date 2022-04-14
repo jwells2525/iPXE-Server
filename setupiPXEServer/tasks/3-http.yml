@@ -29,11 +29,6 @@
     enabled: yes
   when: httpdinstalled.changed
 
-- name: Copy Kickstart Files
-  copy:
-    src: ks
-    dest: /var/www/html/
-
 - name: Create Kickstart HTTP Directory
   file:
     path: /var/www/html/ks

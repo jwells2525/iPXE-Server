@@ -1,6 +1,4 @@
 ---
-# defaults file for setupPXEServer
-#PRIMARY_USER: jwells
 # Variables used for DHCP Configuration
 NET_SUBNET: Subnet
 NET_NETMASK: Network Mask

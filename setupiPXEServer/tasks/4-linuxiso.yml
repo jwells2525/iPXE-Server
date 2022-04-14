@@ -66,3 +66,12 @@
       boot vmlinuz initrd=initrd.img ksdevice=bootif inst.lang=en_US kssendmac inst.text inst.ks=http://{{ SERVER_IP }}/ks/{{ KICKSTART }}
     insertbefore: "#GOTOEND"
   when: KICKSTART|length != 0
+
+- name: Copy Kicstart Template for {{ KICKSTART }}
+  template:
+    src: "{{ KICKSTART }}.j2"
+    dest: /var/www/html/ks/{{ KICKSTART }}
+    owner: root
+    group: root
+    mode: 0644
+  when: KICKSTART|length != 0
