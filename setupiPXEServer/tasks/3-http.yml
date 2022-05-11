@@ -1,5 +1,4 @@
 ---
-# tasks file for http
 - name: Install HTTPD Package
   yum:
     name: httpd
