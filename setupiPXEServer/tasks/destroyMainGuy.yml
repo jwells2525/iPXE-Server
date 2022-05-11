@@ -16,12 +16,11 @@
 
   - name: Erase DHCP Package
     yum:
-      name: '{{ item }}'
+      name: 
+        - dhcp-compat
+        - dhcp-relay
+        - dhcp-server
       state: absent
-    loop:
-      - dhcp-compat
-      - dhcp-relay
-      - dhcp-server
 
   - name: Delete Default DHCP Directory
     file:
