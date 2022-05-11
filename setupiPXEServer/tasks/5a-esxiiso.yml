@@ -1,0 +1,97 @@
+---
+# tasks file for linuxiso
+- name: Check if ISO HTTP Directory Exists
+  stat:
+    path: /var/www/html/{{ MENU_DISTRO }}
+  register: folder_exists
+
+- name: Create ISO HTTP Directory
+  file:
+    path: /var/www/html/{{ MENU_DISTRO }}
+    state: directory
+    mode: '0755'
+    owner: root
+    group: root
+  when: not folder_exists.stat.exists  
+
+- name: Mount ISO read-only
+  mount:
+    path: /var/www/html/{{ MENU_DISTRO }}
+    src: '{{ ISO_DIR }}/{{ ISO_NAME }}'
+    fstype: iso9660
+    opts: loop
+    state: mounted
+  when: not folder_exists.stat.exists
+
+- name: Add boot.cfg
+  copy:
+    src: '/var/www/html/{{ MENU_DISTRO }}/efi/boot/boot.cfg'
+    dest: /var/www/html/boot_{{ MENU_DISTRO }}.cfg
+    remote_src: yes
+    owner: root
+    group: root
+    mode: '0755'
+  when: not folder_exists.stat.exists
+
+- name: Replace / in boot.cfg
+  replace:
+    path: /var/www/html/boot_{{ MENU_DISTRO }}.cfg
+    regexp: '/'
+    replace: ''
+  when: not folder_exists.stat.exists
+
+- name: Replace Prefix in boot.cfg
+  replace:
+    path: /var/www/html/boot_{{ MENU_DISTRO }}.cfg
+    regexp: 'prefix='
+    replace: 'prefix=http://{{ SERVER_IP }}/{{ MENU_DISTRO }}'
+  when: not folder_exists.stat.exists
+
+- name: Adding Menu Entry {{ MENU_DISTRO }}
+  blockinfile:
+    path: /var/www/html/menu.ipxe
+    marker: "# {{ MENU_DISTRO }}"
+    block: |
+      item {{ MENU_DISTRO }} Manual Install of {{ MENU_DISTRO }}
+    insertbefore: "#OPTIONSEND"
+  when: KICKSTART|length == 0
+
+- name: Adding Menu Entry Custom {{ KICKSTART }}
+  blockinfile:
+    path: /var/www/html/menu.ipxe
+    marker: '# {{ KICKSTART.split(".")[0] }}'
+    block: |
+      item {{ KICKSTART.split(".")[0] }} Custom Install of {{ MENU_DISTRO }} from {{ KICKSTART.split(".")[0] }}
+    insertbefore: "#OPTIONSEND"
+  when: KICKSTART|length != 0
+
+- name: Adding Goto Label for {{ MENU_DISTRO }}
+  blockinfile:
+    path: /var/www/html/menu.ipxe
+    marker: "# Goto {{ MENU_DISTRO }}"
+    block: |
+      :{{ MENU_DISTRO }}
+      kernel http://{{ SERVER_IP }}/{{ MENU_DISTRO }}/efi/boot/bootx64.efi -c http://{{ SERVER_IP }}/boot_{{ MENU_DISTRO }}.cfg
+      boot
+    insertbefore: "#GOTOEND"
+  when: KICKSTART|length == 0
+
+- name: Adding Goto Label for {{ KICKSTART }}
+  blockinfile:
+    path: /var/www/html/menu.ipxe
+    marker: '# Goto {{ KICKSTART.split(".")[0] }}'
+    block: |
+      :{{ KICKSTART.split(".")[0] }}
+      kernel http://{{ SERVER_IP }}/{{ MENU_DISTRO }}/efi/boot/bootx64.efi -c http://{{ SERVER_IP }}/boot_{{ MENU_DISTRO }}.cfg
+      boot
+    insertbefore: "#GOTOEND"
+  when: KICKSTART|length != 0
+
+- name: Copy Kicstart Template for {{ KICKSTART }}
+  template:
+    src: "{{ KICKSTART }}.j2"
+    dest: /var/www/html/ks/{{ KICKSTART }}
+    owner: root
+    group: root
+    mode: 0644
+  when: KICKSTART|length != 0

@@ -10,4 +10,7 @@
   include_tasks: 3-http.yml
 
 - name: Setup the Linux Systems
-  include_tasks: linuxSystems.yml
+  include_tasks: 4-linuxSystems.yml
+
+- name: Setup the ESXi Systems
+  include_tasks: 5-esxiSystems.yml

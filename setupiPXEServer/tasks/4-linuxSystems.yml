@@ -1,0 +1,15 @@
+---
+# List of Linux Systems to Setup
+- name: Place Red Hat Enterprise Linux onto PXE Server
+  vars:
+    - MENU_DISTRO:
+    - ISO_NAME:
+    - KICKSTART: ""
+  include_tasks: 4a-linuxiso.yml
+
+- name: Place Kickstart Red Hat Enterprise Linux onto PXE Server
+  vars:
+    - MENU_DISTRO:
+    - ISO_NAME:
+    - KICKSTART:
+  include_tasks: 4a-linuxiso.yml

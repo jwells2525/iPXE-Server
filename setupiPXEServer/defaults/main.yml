@@ -1,15 +1,12 @@
 ---
 # Variables used for DHCP Configuration
-NET_SUBNET: Subnet
-NET_NETMASK: Network Mask
-NET_BROADCAST: Brodcast Address
-NET_ROUTER: Default Gateway
-SERVER_IP: iPXE Server IP
-DHCP_RANGE_START: DHCP Start
-DHCP_RANGE_STOP: DHCP Stop
-
-# Variable to know where PXE is to download the ISOs from
-HTTP_SERVER_IP: IP for HTTP Server
+NET_SUBNET:
+NET_NETMASK:
+NET_BROADCAST:
+NET_ROUTER:
+SERVER_IP:
+DHCP_RANGE_START:
+DHCP_RANGE_STOP:
 
 # Variable for Path to ISO Directory
-ISO_DIR: "ISO Directory Path"
+ISO_DIR:
