@@ -45,4 +45,7 @@
     mode: '0755'
 
 - name: Apply New SELinux File Context to /var/www/html
-  command: restorecon -FvvR /var/www/html
+  command: restorecon -FvvR /var/www/html/{{ item }}
+  loop:
+    - menu.ipxe
+    - ks

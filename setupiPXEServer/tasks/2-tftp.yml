@@ -52,5 +52,8 @@
   when: ipxeinstalled.changed
 
 - name: Apply New SELinux File Context to /var/lib/tftpboot
-  command: restorecon -FvvR /var/lib/tftpboot
+  command: restorecon -FvvR /var/lib/tftpboot/{{ item }}
+  loop:
+    - undionly.kpxe
+    - ipxe-x86_64.efi
   when: ipxeinstalled.changed
