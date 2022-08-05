@@ -49,9 +49,13 @@ The name of the ISO that will be used to PXE Boot to.
 
 The name of the Kickstart File.
 
-**KICKSTART:** ""
+**KICKSTART:** "" \# No Kickstart used
 
-If a Kickstart file is not specified, then the system will boot into the default ISO menu. If a Kickstart file is specified, the ISO in which it is associated should be filled into the ISO_NAME.
+or
+
+**KICKSTART:** "myKickstart.cfg"
+
+If a Kickstart file is not specified (string of length 0), then the system will boot into the default ISO menu. If a Kickstart file is specified, the ISO in which it is associated should be filled into the ISO_NAME. The Kickstart should be templatized and placed into the templates/ directory, with ".j2" added to the filename. For the above example of "myKickstart.cfg", the templace was added as "templates/myKickstart.cfg.j2"
 
 Similar to 4 and 4a is 5 and 5a. These will setup the ESXi systems. The same rules apply as above for these systems.
 
