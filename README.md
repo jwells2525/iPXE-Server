@@ -2,6 +2,8 @@
 
 This Ansible Role will set up an iPXE Server that is capable of PXE booting Linux Distrobutions to a system with Legacy BIOS and UEFI. It is also capable of using the same instance to PXE Boot ESXi onto a UEFI System.
 
+This role will ONLY work with IPv4 Implementations.
+
 ## Defaults main.yml
 This File contains the necessary variables to set up the iPXE Server. Examples are used to show Exepcted Input.
 
