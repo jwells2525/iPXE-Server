@@ -1,21 +1,21 @@
 ---
 # tasks file for linuxiso
 - name: Check if ISO HTTP Directory Exists
-  stat:
+  ansible.builtin.stat:
     path: /var/www/html/{{ MENU_DISTRO }}
   register: folder_exists
 
 - name: Create ISO HTTP Directory
-  file:
+  ansible.builtin.file:
     path: /var/www/html/{{ MENU_DISTRO }}
     state: directory
     mode: '0755'
     owner: root
     group: root
-  when: not folder_exists.stat.exists  
+  when: not folder_exists.stat.exists
 
 - name: Mount ISO read-only
-  mount:
+  ansible.posix.mount:
     path: /var/www/html/{{ MENU_DISTRO }}
     src: '{{ ISO_DIR }}/{{ ISO_NAME }}'
     fstype: iso9660
@@ -24,31 +24,31 @@
   when: not folder_exists.stat.exists
 
 - name: Add boot.cfg
-  copy:
+  ansible.builtin.copy:
     src: '/var/www/html/{{ MENU_DISTRO }}/efi/boot/boot.cfg'
     dest: /var/www/html/boot_{{ MENU_DISTRO }}.cfg
-    remote_src: yes
+    remote_src: true
     owner: root
     group: root
     mode: '0755'
   when: not folder_exists.stat.exists
 
 - name: Replace / in boot.cfg
-  replace:
+  ansible.builtin.replace:
     path: /var/www/html/boot_{{ MENU_DISTRO }}.cfg
     regexp: '/'
     replace: ''
   when: not folder_exists.stat.exists
 
 - name: Replace Prefix in boot.cfg
-  replace:
+  ansible.builtin.replace:
     path: /var/www/html/boot_{{ MENU_DISTRO }}.cfg
     regexp: 'prefix='
     replace: 'prefix=http://{{ SERVER_IP }}/{{ MENU_DISTRO }}'
   when: not folder_exists.stat.exists
 
 - name: Adding Menu Entry {{ MENU_DISTRO }}
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /var/www/html/menu.ipxe
     marker: "# {{ MENU_DISTRO }}"
     block: |
@@ -57,7 +57,7 @@
   when: KICKSTART|length == 0
 
 - name: Adding Menu Entry Custom {{ KICKSTART }}
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /var/www/html/menu.ipxe
     marker: '# {{ KICKSTART.split(".")[0] }}'
     block: |
@@ -66,7 +66,7 @@
   when: KICKSTART|length != 0
 
 - name: Adding Goto Label for {{ MENU_DISTRO }}
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /var/www/html/menu.ipxe
     marker: "# Goto {{ MENU_DISTRO }}"
     block: |
@@ -77,7 +77,7 @@
   when: KICKSTART|length == 0
 
 - name: Adding Goto Label for {{ KICKSTART }}
-  blockinfile:
+  ansible.builtin.blockinfile:
     path: /var/www/html/menu.ipxe
     marker: '# Goto {{ KICKSTART.split(".")[0] }}'
     block: |
@@ -88,10 +88,10 @@
   when: KICKSTART|length != 0
 
 - name: Copy Kicstart Template for {{ KICKSTART }}
-  template:
+  ansible.builtin.template:
     src: "{{ KICKSTART }}.j2"
     dest: /var/www/html/ks/{{ KICKSTART }}
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   when: KICKSTART|length != 0

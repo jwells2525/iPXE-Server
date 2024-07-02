@@ -1,16 +1,16 @@
 ---
 # tasks file for setupPXEServer
 - name: Setup DHCP on System
-  include_tasks: 1-dhcp.yml
+  ansible.builtin.include_tasks: 1-dhcp.yml
 
 - name: Setup TFTP on System
-  include_tasks: 2-tftp.yml
+  ansible.builtin.include_tasks: 2-tftp.yml
 
 - name: Setup HTTP on System
-  include_tasks: 3-http.yml
+  ansible.builtin.include_tasks: 3-http.yml
 
 - name: Setup the Linux Systems
-  include_tasks: 4-linuxSystems.yml
+  ansible.builtin.include_tasks: 4-linuxSystems.yml
 
 - name: Setup the ESXi Systems
-  include_tasks: 5-esxiSystems.yml
+  ansible.builtin.include_tasks: 5-esxiSystems.yml

@@ -1,0 +1,92 @@
+---
+- name: Destroy iPXE Server
+  hosts: localhost
+  become: true
+  tasks:
+
+    - name: Unmount Directories # noqa ignore-errors no-changed-when
+      ansible.builtin.command: umount /var/www/html/{{ item }}
+      ignore_errors: true
+      loop:
+        - rhel
+
+    - name: Erase ipxe-bootimgs Package
+      ansible.builtin.dnf:
+        name: ipxe-bootimgs
+        state: absent
+
+    - name: Erase DHCP Package
+      ansible.builtin.dnf:
+        name:
+          - dhcp-compat
+          - dhcp-relay
+          - dhcp-server
+        state: absent
+
+    - name: Delete Default DHCP Directory
+      ansible.builtin.file:
+        path: /etc/dhcp/
+        state: absent
+
+    - name: Disable TFTP on Firewall
+      ansible.posix.firewalld:
+        service: tftp
+        permanent: true
+        state: disabled
+
+    - name: Erase TFTP Package
+      ansible.builtin.dnf:
+        name: tftp-server
+        state: absent
+
+    - name: Delete TFTP Directory
+      ansible.builtin.file:
+        path: /var/lib/tftpboot
+        state: absent
+
+    - name: Erase SysLinux Package
+      ansible.builtin.dnf:
+        name: syslinux
+        state: absent
+
+    - name: Delete Temp Install Directory
+      ansible.builtin.file:
+        path: /tmp/fedora
+        state: absent
+
+    - name: Delete HTML Directories
+      ansible.builtin.file:
+        path: /var/www/html/{{ item }}
+        state: absent
+      loop:
+        - fedoraserver
+        - centos
+        - rocky
+        - rhel
+        - rhel7
+        - esxi
+        - kickstarts
+        - ks
+        - menu.ipxe
+
+    - name: Disable HTTP on Firewall
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        state: disabled
+
+    - name: Disable HTTPS on Firewall
+      ansible.posix.firewalld:
+        service: https
+        permanent: true
+        state: disabled
+
+    - name: Erase HTTPD Package
+      ansible.builtin.dnf:
+        name: httpd
+        state: absent
+
+    - name: Delete ISO Mount Directory
+      ansible.builtin.file:
+        path: /mnt/iso
+        state: absent
