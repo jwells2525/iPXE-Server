@@ -5,7 +5,7 @@
     manager: auto
 
 - name: Install and Set Up DHCP if Not Installed
-  when: not "'dhcp-server' in ansible_facts.packages"
+  when: "'dhcp-server' not in ansible_facts.packages"
   block:
 
     - name: Install DHCP Package

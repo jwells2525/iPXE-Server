@@ -26,7 +26,8 @@
 - name: Adding Menu Entry {{ MENU_DISTRO }}
   ansible.builtin.blockinfile:
     path: /var/www/html/menu.ipxe
-    marker: "# {{ MENU_DISTRO }}"
+    marker_begin: "# {{ MENU_DISTRO }} Begin"
+    marker_end: "# {{ MENU_DISTRO }} End"
     block: |
       item {{ MENU_DISTRO }} Manual Install of {{ MENU_DISTRO }}
     insertbefore: "#OPTIONSEND"
@@ -35,7 +36,8 @@
 - name: Adding Menu Entry Custom {{ KICKSTART }}
   ansible.builtin.blockinfile:
     path: /var/www/html/menu.ipxe
-    marker: '# {{ KICKSTART.split(".")[0] }}'
+    marker_begin: '# {{ KICKSTART.split(".")[0] }} Begin'
+    marker_end: '# {{ KICKSTART.split(".")[0] }} End'
     block: |
       item {{ KICKSTART.split(".")[0] }} Custom Install of {{ MENU_DISTRO }} from {{ KICKSTART.split(".")[0] }}
     insertbefore: "#OPTIONSEND"
@@ -44,7 +46,8 @@
 - name: Adding Goto Label for {{ MENU_DISTRO }}
   ansible.builtin.blockinfile:
     path: /var/www/html/menu.ipxe
-    marker: "# Goto {{ MENU_DISTRO }}"
+    marker_begin: "# Goto {{ MENU_DISTRO }} Begin"
+    marker_end: "# Goto {{ MENU_DISTRO }} End"
     block: |
       :{{ MENU_DISTRO }}
       dhcp
@@ -57,7 +60,8 @@
 - name: Adding Goto Label for {{ KICKSTART }}
   ansible.builtin.blockinfile:
     path: /var/www/html/menu.ipxe
-    marker: '# Goto {{ KICKSTART.split(".")[0] }}'
+    marker_begin: '# Goto {{ KICKSTART.split(".")[0] }} Begin'
+    marker_end: '# Goto {{ KICKSTART.split(".")[0] }} End'
     block: |
       :{{ KICKSTART.split(".")[0] }}
       dhcp

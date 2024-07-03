@@ -1,8 +1,8 @@
 ---
 # List of ESXi Systems to Setup
-- name: Place VMWare ESXi onto PXE Server
+# - name: Place VMWare ESXi onto PXE Server
 #  vars:
 #    - MENU_DISTRO:
 #    - ISO_NAME:
 #    - KICKSTART:
-  ansible.builtin.include_tasks: 5a-esxiiso.yml
+#  ansible.builtin.include_tasks: 5a-esxiiso.yml

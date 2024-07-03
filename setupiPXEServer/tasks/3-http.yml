@@ -4,9 +4,8 @@
     manager: auto
 
 - name: Install and Set Up HTTPD if Not Installed
-  when: not "'httpd' in ansible_facts.packages"
+  when: "'httpd' not in ansible_facts.packages"
   block:
-
     - name: Install HTTPD Package
       ansible.builtin.dnf:
         name: httpd
@@ -38,7 +37,7 @@
   register: ks
 
 - name: Setup Kickstart Directory
-  when: not ks.exists
+  when: not ks.stat.exists
   block:
     - name: Create Kickstart HTTP Directory
       ansible.builtin.file:
@@ -51,13 +50,22 @@
     - name: Apply SELinux Context to Kickstart Directory # noqa no-changed-when
       ansible.builtin.command: restorecon -FvvR /var/www/html/ks
 
-- name: Copy iPXE Boot Menu Template
-  ansible.builtin.template:
-    src: "menu.ipxe.j2"
-    dest: /var/www/html/menu.ipxe
-    owner: root
-    group: root
-    mode: '0755'
+- name: Check for menu.ipxe File
+  ansible.builtin.stat:
+    path: /var/www/html/ks
+  register: mif
 
-- name: Apply New SELinux File Context to /var/www/html # noqa no-changed-when
-  ansible.builtin.command: restorecon -FvvR /var/www/html/menu.ipxe
+- name: Setup Kickstart Directory
+  when: not ks.stat.exists
+  block:
+
+    - name: Copy iPXE Boot Menu Template
+      ansible.builtin.template:
+        src: "menu.ipxe.j2"
+        dest: /var/www/html/menu.ipxe
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Apply New SELinux File Context to /var/www/html # noqa no-changed-when
+      ansible.builtin.command: restorecon -FvvR /var/www/html/menu.ipxe

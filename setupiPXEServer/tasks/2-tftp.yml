@@ -5,7 +5,7 @@
     manager: auto
 
 - name: Install and Set Up TFTP if Not Installed
-  when: not "'tftp-server' in ansible_facts.packages"
+  when: "'tftp-server' not in ansible_facts.packages"
   block:
 
     - name: Install TFTP Package
@@ -33,7 +33,7 @@
         enabled: true
 
 - name: Install and Set Up iPXE if Not Installed
-  when: not "'ipxe-bootimgs' in ansible_facts.packages"
+  when: "'ipxe-bootimgs-x86' not in ansible_facts.packages"
   block:
 
     - name: Install iPXE Package

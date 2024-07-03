@@ -1,6 +1,6 @@
 ---
 - name: Destroy iPXE Server
-  hosts: localhost
+  hosts: ipxe
   become: true
   tasks:
 
