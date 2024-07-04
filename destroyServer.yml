@@ -59,13 +59,6 @@
         path: /var/www/html/{{ item }}
         state: absent
       loop:
-        - fedoraserver
-        - centos
-        - rocky
-        - rhel
-        - rhel7
-        - esxi
-        - kickstarts
         - ks
         - menu.ipxe
 

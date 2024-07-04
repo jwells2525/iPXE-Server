@@ -2,21 +2,21 @@
 # List of Linux Systems to Setup
 - name: Place Red Hat Enterprise Linux 8.10 onto PXE Server
   vars:
-    - MENU_DISTRO: "RHEL8"
-    - ISO_NAME: "rhel-8.10-x86_64-dvd.iso"
-    - KICKSTART: ""
+    MENU_DISTRO: "RHEL8"
+    ISO_NAME: "rhel-8.10-x86_64-dvd.iso"
+    KICKSTART: ""
   ansible.builtin.include_tasks: 4a-linuxiso.yml
 
 - name: Place Red Hat Enterprise Linux 9.4 onto PXE Server
   vars:
-    - MENU_DISTRO: "RHEL9"
-    - ISO_NAME: "rhel-9.4-x86_64-dvd.iso"
-    - KICKSTART: ""
+    MENU_DISTRO: "RHEL9"
+    ISO_NAME: "rhel-9.4-x86_64-dvd.iso"
+    KICKSTART: ""
   ansible.builtin.include_tasks: 4a-linuxiso.yml
 
 # - name: Place Kickstart Red Hat Enterprise Linux onto PXE Server
 #  vars:
-#    - MENU_DISTRO:
-#    - ISO_NAME:
-#    - KICKSTART:
+#    MENU_DISTRO:
+#    ISO_NAME:
+#    KICKSTART:
 #  ansible.builtin.include_tasks: 4a-linuxiso.yml

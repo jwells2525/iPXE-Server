@@ -5,8 +5,8 @@ NET_NETMASK: "{{ ansible_facts.default_ipv4.netmask }}"
 NET_BROADCAST: "{{ ansible_facts.default_ipv4.broadcast }}"
 NET_ROUTER: "{{ ansible_facts.default_ipv4.gateway }}"
 SERVER_IP: "{{ ansible_facts.default_ipv4.address }}"
-DHCP_RANGE_START: "{{ ansible_facts.default_ipv4.broadcast.split('.')[0] }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[1] }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[2] }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[3] | int - 1 }}"
-DHCP_RANGE_STOP: "{{ ansible_facts.default_ipv4.broadcast.split('.')[0] }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[1] }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[2] }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[3] | int - 1 - 10 }}"
+DHCP_RANGE_START: "{{ ansible_facts.default_ipv4.broadcast.split('.')[:3] | join('.') }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[3] | int - 1 }}"
+DHCP_RANGE_STOP: "{{ ansible_facts.default_ipv4.broadcast.split('.')[:3] | join('.') }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[3] | int - 1 - 10 }}"
 
 # Variable for Path to ISO Directory
 ISO_DIR: "/tmp/iso"
