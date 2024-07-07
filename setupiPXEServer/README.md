@@ -1,38 +1,77 @@
-Role Name
-=========
+# Setup an iPXE Server
 
-A brief description of the role goes here.
+This Ansible Role will set up an iPXE Server that is capable of PXE booting Linux Distributions to a system with Legacy BIOS and UEFI. It is also capable of using the same instance to PXE Boot ESXi onto a UEFI System.
 
-Requirements
-------------
+This role has only been tested to work with IPv4 Implementations.
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+## Defaults main.yml
+This File contains the necessary variables to set up the iPXE Server. 
 
-Role Variables
---------------
+```yaml
+# The Directory in which the ISO Files are stored.  
+ISO_DIR: "/Path/To/ISO/Directory"
+```
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+All IP Addresses are automatically detected from the Default IPv4 Informaiton on the system.
+```yaml
+# The Network that will Host the iPXE Server.  
+NET_SUBNET: "{{ ansible_facts.default_ipv4.network }}"
+# The Network Mask that the iPXE Server will use.  
+NET_NETMASK: "{{ ansible_facts.default_ipv4.netmask }}"
+# The Broadcast Address.  
+NET_BROADCAST: "{{ ansible_facts.default_ipv4.broadcast }}"
+# The Networks Gateway.  
+NET_ROUTER: "{{ ansible_facts.default_ipv4.gateway }}"
+# The IP Address of the iPXE Server.  
+SERVER_IP: "{{ ansible_facts.default_ipv4.address }}"
+# The Start and Stop IP Address for the Addresses the DHCP Server will hand out. Defaults to 10 IPs 10 prior to the broadcast address.
+DHCP_RANGE_START: "{{ ansible_facts.default_ipv4.broadcast.split('.')[:3] | join('.') }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[3] | int - 1 }}"
+DHCP_RANGE_STOP: "{{ ansible_facts.default_ipv4.broadcast.split('.')[:3] | join('.') }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[3] | int - 1 - 10 }}"
+```
+All of these values can be changed manually if specific values should be used.
+```yaml
+# The Network that will Host the iPXE Server.  
+NET_SUBNET: "192.168.1.0"
+# The Network Mask that the iPXE Server will use.  
+NET_NETMASK: "255.255.255.0"
+# The Broadcast Address.  
+NET_BROADCAST: "192.168.1.254"
+# The Networks Gateway.  
+NET_ROUTER: "192.168.1.1"
+# The IP Address of the iPXE Server.  
+SERVER_IP: "192.168.1.15"
+# The Start and Stop IP Address for the Addresses the DHCP Server will hand out. Defaults to 10 IPs 10 prior to the broadcast address.
+DHCP_RANGE_START: "192.168.1.243"
+DHCP_RANGE_STOP: "192.168.1.253"
+```
 
-Dependencies
-------------
+## Tasks
+Tasks are short and perform a specific task to set up the system. 
+4-linuxSystems.yml is used to define the specific variables that are passed into 4a-linuxiso.yml. This includes:
+```yaml
+# A unique varialbe used to identify the OS.  
+MENU_DISTRO: 'RHEL9'
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+# The name of the ISO that will be used to PXE Boot to.  
+ISO_NAME: 'rhel-8.4-x86_64-dvd.iso'
 
-Example Playbook
-----------------
+# The name of the Kickstart File.  
+KICKSTART: "" # No Kickstart used  
+    OR
+KICKSTART: "myKickstart.cfg"
+```
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+If a Kickstart file is not specified (string of length 0), then the system will boot into the default ISO menu. If a Kickstart file is specified, the ISO in which it is associated should be filled into the ISO_NAME. The Kickstart should be templatized and placed into the templates/ directory, with ".j2" added to the filename. For the above example of "myKickstart.cfg", the template was added as "templates/myKickstart.cfg.j2"
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+Similar to 4 and 4a is 5 and 5a. These will setup the ESXi systems. The same rules apply as above for these systems.
 
-License
--------
+**main.yml** is where each of the different tasks are called. This can be customized based on the need of the system.
 
-BSD
+## Templates
+These are used to setup the system. Also, each Kickstart file that is being used should be placed into the templates directory to be used during the setup of the iPXE Server.
 
-Author Information
-------------------
+## setupiPXEServer.yml
+This can be used to execute the role. If this role is incorporated into a larger role, then this YAML can be omitted.
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+## destroyiPXEServer.yml 
+This playbook is independent of the role, but can be used to remove the iPXE Server components.

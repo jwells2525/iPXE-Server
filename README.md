@@ -2,7 +2,7 @@
 
 This Ansible Role will set up an iPXE Server that is capable of PXE booting Linux Distributions to a system with Legacy BIOS and UEFI. It is also capable of using the same instance to PXE Boot ESXi onto a UEFI System.
 
-This role will has only been tested to work with IPv4 Implementations.
+This role has only been tested to work with IPv4 Implementations.
 
 ## Defaults main.yml
 This File contains the necessary variables to set up the iPXE Server. 
@@ -50,13 +50,13 @@ Tasks are short and perform a specific task to set up the system.
 4-linuxSystems.yml is used to define the specific variables that are passed into 4a-linuxiso.yml. This includes:
 ```yaml
 # A unique varialbe used to identify the OS.  
-MENU_DISTRO: 'RHEL8'
+MENU_DISTRO: 'RHEL9'
 
 # The name of the ISO that will be used to PXE Boot to.  
-ISO_NAME: 'rhel-8.5-x86_64-dvd.iso'
+ISO_NAME: 'rhel-8.4-x86_64-dvd.iso'
 
 # The name of the Kickstart File.  
-KICKSTART: "" \# No Kickstart used  
+KICKSTART: "" # No Kickstart used  
     OR
 KICKSTART: "myKickstart.cfg"
 ```
