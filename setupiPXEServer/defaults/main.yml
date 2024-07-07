@@ -1,4 +1,7 @@
 ---
+# Variable for Path to ISO Directory
+ISO_DIR: "/tmp/iso"
+
 # Variables used for DHCP Configuration
 NET_SUBNET: "{{ ansible_facts.default_ipv4.network }}"
 NET_NETMASK: "{{ ansible_facts.default_ipv4.netmask }}"
@@ -7,6 +10,3 @@ NET_ROUTER: "{{ ansible_facts.default_ipv4.gateway }}"
 SERVER_IP: "{{ ansible_facts.default_ipv4.address }}"
 DHCP_RANGE_START: "{{ ansible_facts.default_ipv4.broadcast.split('.')[:3] | join('.') }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[3] | int - 1 }}"
 DHCP_RANGE_STOP: "{{ ansible_facts.default_ipv4.broadcast.split('.')[:3] | join('.') }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[3] | int - 1 - 10 }}"
-
-# Variable for Path to ISO Directory
-ISO_DIR: "/tmp/iso"
