@@ -52,11 +52,11 @@
 
 - name: Check for menu.ipxe File
   ansible.builtin.stat:
-    path: /var/www/html/ks
-  register: mif
+    path: /var/www/html/menu.ipxe
+  register: mi
 
-- name: Setup Kickstart Directory
-  when: not ks.stat.exists
+- name: Setup iPXE Menu
+  when: not mi.stat.exists
   block:
 
     - name: Copy iPXE Boot Menu Template
