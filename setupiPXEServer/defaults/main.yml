@@ -1,15 +1,18 @@
 ---
 # Variables used for DHCP Configuration
-NET_SUBNET: Subnet
-NET_NETMASK: Network Mask
-NET_BROADCAST: Brodcast Address
-NET_ROUTER: Default Gateway
-SERVER_IP: iPXE Server IP
-DHCP_RANGE_START: DHCP Start
-DHCP_RANGE_STOP: DHCP Stop
+# The Directory in which the ISO Files are stored.
+ISO_DIR: "/Path/To/ISO/Directory"
 
-# Variable to know where PXE is to download the ISOs from
-HTTP_SERVER_IP: IP for HTTP Server
-
-# Variable for Path to ISO Directory
-ISO_DIR: "ISO Directory Path"
+# The Network that will Host the iPXE Server.
+NET_SUBNET: "{{ ansible_facts.default_ipv4.network }}"
+# The Network Mask that the iPXE Server will use.
+NET_NETMASK: "{{ ansible_facts.default_ipv4.netmask }}"
+# The Broadcast Address.
+NET_BROADCAST: "{{ ansible_facts.default_ipv4.broadcast }}"
+# The Networks Gateway.
+NET_ROUTER: "{{ ansible_facts.default_ipv4.gateway }}"
+# The IP Address of the iPXE Server.
+SERVER_IP: "{{ ansible_facts.default_ipv4.address }}"
+# The Start and Stop IP Address for the Addresses the DHCP Server will hand out.
+DHCP_RANGE_START: "{{ ansible_facts.default_ipv4.broadcast.split('.')[:3] | join('.') }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[3] | int - 1 }}"
+DHCP_RANGE_STOP: "{{ ansible_facts.default_ipv4.broadcast.split('.')[:3] | join('.') }}.{{ ansible_facts.default_ipv4.broadcast.split('.')[3] | int - 1 - 10 }}"

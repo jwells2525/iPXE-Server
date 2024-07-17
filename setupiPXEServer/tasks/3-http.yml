@@ -1,51 +1,71 @@
 ---
-- name: Install HTTPD Package
-  yum:
-    name: httpd
-    state: present
-  register: httpdinstalled
-  
-- name: Open HTTP Port on the Firewall
-  firewalld:
-    service: http
-    permanent: yes
-    state: enabled
-    immediate: yes
-  when: httpdinstalled.changed
+- name: Gather Package Facts
+  ansible.builtin.package_facts:
+    manager: auto
 
-- name: Open HTTPS Port on the Firewall
-  firewalld:
-    service: https
-    permanent: yes
-    state: enabled
-    immediate: yes
-  when: httpdinstalled.changed
-  
-- name: Start and Enable HTTPD Service
-  service:
-    name: httpd
-    state: started
-    enabled: yes
-  when: httpdinstalled.changed
+- name: Install and Set Up HTTPD if Not Installed
+  when: "'httpd' not in ansible_facts.packages"
+  block:
+    - name: Install HTTPD Package
+      ansible.builtin.dnf:
+        name: httpd
+        state: present
 
-- name: Create Kickstart HTTP Directory
-  file:
+    - name: Open HTTP Port on the Firewall
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+
+    - name: Open HTTPS Port on the Firewall
+      ansible.posix.firewalld:
+        service: https
+        permanent: true
+        state: enabled
+        immediate: true
+
+    - name: Start and Enable HTTPD Service
+      ansible.builtin.service:
+        name: httpd
+        state: started
+        enabled: true
+
+- name: Check for Kickstart Directory
+  ansible.builtin.stat:
     path: /var/www/html/ks
-    state: directory
-    mode: '0755'
-    owner: root
-    group: root
+  register: ks
 
-- name: Copy iPXE Boot Menu Template
-  template:
-    src: "menu.ipxe.j2"
-    dest: /var/www/html/menu.ipxe
-    owner: root
-    group: root
-    mode: '0755'
+- name: Setup Kickstart Directory
+  when: not ks.stat.exists
+  block:
+    - name: Create Kickstart HTTP Directory
+      ansible.builtin.file:
+        path: /var/www/html/ks
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
 
-- name: Apply New SELinux File Context to /var/www/html
-  command: restorecon -FvvR /var/www/html/{{ item }}
-  loop:
-    - menu.ipxe
-    - ks
+    - name: Apply SELinux Context to Kickstart Directory # noqa no-changed-when
+      ansible.builtin.command: restorecon -FvvR /var/www/html/ks
+
+- name: Check for menu.ipxe File
+  ansible.builtin.stat:
+    path: /var/www/html/menu.ipxe
+  register: mi
+
+- name: Setup iPXE Menu
+  when: not mi.stat.exists
+  block:
+
+    - name: Copy iPXE Boot Menu Template
+      ansible.builtin.template:
+        src: "menu.ipxe.j2"
+        dest: /var/www/html/menu.ipxe
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Apply New SELinux File Context to /var/www/html # noqa no-changed-when
+      ansible.builtin.command: restorecon -FvvR /var/www/html/menu.ipxe

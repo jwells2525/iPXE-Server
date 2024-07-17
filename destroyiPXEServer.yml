@@ -1,0 +1,46 @@
+---
+- name: Destroy iPXE Server
+  hosts: ipxe
+  become: true
+  tasks:
+
+    - name: Disable HTTP, HTTPS, and TFTP on Firewall
+      ansible.posix.firewalld:
+        service: "{{ item }}"
+        permanent: true
+        state: disabled
+        immediate: true
+      with_items:
+        - http
+        - https
+        - tftp
+
+    - name: Unmount Directories # noqa ignore-errors no-changed-when
+      ansible.builtin.command: umount {{ item.mount }}
+      with_items: "{{ ansible_mounts }}"
+      when: "'/var/www/html' in item.mount"
+
+    - name: Delete HTML Directories
+      ansible.builtin.file:
+        path: /var/www/html/
+        state: absent
+
+    - name: Erase Packages
+      ansible.builtin.dnf:
+        name:
+          - ipxe-bootimgs
+          - dhcp-compat
+          - dhcp-relay
+          - dhcp-server
+          - tftp-server
+          - httpd
+        state: absent
+        autoremove: true
+
+    - name: Delete Default DHCP and TFTP Directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      with_items:
+        - /etc/dhcp/
+        - /var/lib/tftpboot

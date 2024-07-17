@@ -1,6 +1,8 @@
 ---
-- hosts: mainGuy
-  become: True
+- name: Set Up an iPXE Server
+  hosts: ipxe
+  gather_facts: true
+  become: true
 
   roles:
     - { role: setupiPXEServer }

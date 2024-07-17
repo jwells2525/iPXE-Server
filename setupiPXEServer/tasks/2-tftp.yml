@@ -1,59 +1,66 @@
 ---
 # tasks file for tftp
-- name: Install TFTP Package
-  yum:
-    name: tftp-server
-    state: present
-  register: tftpinstalled
-  
-- name: Open TFTP on the Firewall
-  firewalld:
-    service: tftp
-    permanent: yes
-    state: enabled
-    immediate: yes
-  when: tftpinstalled.changed
-  
-- name: Restart and Enable TFTP
-  service:
-    name: tftp
-    state: restarted
-    enabled: yes
-  when: tftpinstalled.changed
-  
-- name: Restart and Enable TFTP Socket
-  service:
-    name: tftp.socket
-    state: restarted
-    enabled: yes
-  when: tftpinstalled.changed
+- name: Gather Package Facts
+  ansible.builtin.package_facts:
+    manager: auto
 
-- name: Install iPXE Package
-  yum:
-    name: ipxe-bootimgs
-    state: present
-  register: ipxeinstalled
+- name: Install and Set Up TFTP if Not Installed
+  when: "'tftp-server' not in ansible_facts.packages"
+  block:
 
-- name: Copy TFTP UEFI PXEBoot Files
-  copy:
-    src: '{{ item }}'
-    dest: /var/lib/tftpboot/
-    remote_src: yes
-  loop:
-    - /usr/share/ipxe/undionly.kpxe
-    - /usr/share/ipxe/ipxe-x86_64.efi
-  when: ipxeinstalled.changed
+    - name: Install TFTP Package
+      ansible.builtin.dnf:
+        name: tftp-server
+        state: present
 
-- name: Change Permissions on tftpboot and SubDirectories
-  file:
-    path: /var/lib/tftpboot
-    mode: '0755'
-    recurse: yes
-  when: ipxeinstalled.changed
+    - name: Open TFTP on the Firewall
+      ansible.posix.firewalld:
+        service: tftp
+        permanent: true
+        state: enabled
+        immediate: true
 
-- name: Apply New SELinux File Context to /var/lib/tftpboot
-  command: restorecon -FvvR /var/lib/tftpboot/{{ item }}
-  loop:
-    - undionly.kpxe
-    - ipxe-x86_64.efi
-  when: ipxeinstalled.changed
+    - name: Restart and Enable TFTP
+      ansible.builtin.service:
+        name: tftp
+        state: restarted
+        enabled: true
+
+    - name: Restart and Enable TFTP Socket
+      ansible.builtin.service:
+        name: tftp.socket
+        state: restarted
+        enabled: true
+
+- name: Install and Set Up iPXE if Not Installed
+  when: "'ipxe-bootimgs-x86' not in ansible_facts.packages"
+  block:
+
+    - name: Install iPXE Package
+      ansible.builtin.dnf:
+        name: ipxe-bootimgs
+        state: present
+
+    - name: Copy TFTP UEFI PXEBoot Files
+      ansible.builtin.copy:
+        src: '{{ item }}'
+        dest: /var/lib/tftpboot/
+        mode: '0755'
+        owner: root
+        group: root
+        remote_src: true
+      loop:
+        - /usr/share/ipxe/undionly.kpxe
+        - /usr/share/ipxe/ipxe-x86_64.efi
+
+    - name: Change Permissions on tftpboot and SubDirectories
+      ansible.builtin.file:
+        path: /var/lib/tftpboot
+        mode: '0755'
+        recurse: true
+
+    - name: Apply New SELinux File Context to /var/lib/tftpboot # noqa no-changed-when
+      ansible.builtin.command: restorecon -FvvR /var/lib/tftpboot/{{ item }}
+      loop:
+        - undionly.kpxe
+        - ipxe-x86_64.efi
